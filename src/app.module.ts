@@ -6,6 +6,8 @@ import { CatsModule } from './cats/cats.module';
 import { ProductModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
+import { CategoryService } from './category/category.service';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -14,8 +16,9 @@ import { ConfigModule } from '@nestjs/config';
     CatsModule,
     ProductModule,
     UsersModule,
+    CategoryModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CategoryService],
 })
 export class AppModule {}

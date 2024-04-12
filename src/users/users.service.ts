@@ -31,19 +31,40 @@ export class UsersService {
   ): Promise<boolean> {
     return await bcrypt.compare(plainTextPassword, hashedPassword);
   }
-  async registerUser(userData: Partial<User>): Promise<User> {
+
+  async hashingPassword(password: string) {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(userData.password, salt);
-    const newUser = new this.userModel({
-      ...userData,
-      password: hashedPassword, // 해싱된 비밀번호로 교체
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword;
+  }
+
+  async registerUser(userData: Partial<User>) {
+    const isSameEmail = await this.userModel.findOne({ email: userData.email });
+    const isSamePhoneNumber = await this.userModel.findOne({
+      phoneNumber: userData.phoneNumber,
     });
-    return newUser.save();
+
+    if (isSameEmail) throw new BadRequestException('동일한 이메일이 있습니다.');
+    if (isSamePhoneNumber)
+      throw new BadRequestException('동일한 휴대폰 번호가 있습니다.');
+
+    try {
+      const password = await this.hashingPassword(userData.password);
+      const newUser = new this.userModel({
+        ...userData,
+        password: password,
+      });
+      return await newUser.save();
+      // return '회원가입에 성공했습니다.';
+    } catch (error) {
+      throw new BadRequestException('통신 에러가 발생했습니다.');
+    }
   }
   async authenticateUser(email: string, password: string) {
     const user = await this.userModel.findOne({ email: email }).exec();
-    // const user = await this.userModel.findOne({ $where: email }).exec();
+
     if (!user) throw new BadRequestException('존재하지 않는 이메일 입니다.');
+
     const isSamePassword = await this.comparePasswords(password, user.password);
     if (!isSamePassword)
       throw new BadRequestException('비밀번호가 일치하지 않습니다.');

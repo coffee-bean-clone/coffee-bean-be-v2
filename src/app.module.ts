@@ -11,17 +11,18 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
+import { UsersController } from './users/users.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URL),
-    ProductModule,
     UsersModule,
-    CategoryModule,
     AuthModule,
+    ProductModule,
+    CategoryModule,
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController, AuthController, UsersController],
   providers: [AppService, CategoryService, AuthService, JwtService],
 })
 export class AppModule {}

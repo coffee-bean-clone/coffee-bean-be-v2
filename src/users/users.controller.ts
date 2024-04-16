@@ -1,8 +1,17 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserJoinRequestDTO } from './dto/UserJoinRequestDTO';
 import { UserLoginRequestDTO } from './dto/UserLoginRequestDTO';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -35,5 +44,11 @@ export class UsersController {
       userInfo.email,
       userInfo.password,
     );
+  }
+
+  @Get('/profile')
+  @UseGuards(JwtAuthGuard)
+  getProfile(@Body() userInfo) {
+    return userInfo;
   }
 }

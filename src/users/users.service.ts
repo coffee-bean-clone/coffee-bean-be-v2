@@ -65,9 +65,9 @@ export class UsersService {
 
     if (!user) throw new BadRequestException('존재하지 않는 이메일 입니다.');
 
-    const isSamePassword = await this.comparePasswords(password, user.password);
-    if (!isSamePassword)
+    const isMatch = await this.comparePasswords(password, user.password);
+    if (!isMatch)
       throw new BadRequestException('비밀번호가 일치하지 않습니다.');
-    return true;
+    return user;
   }
 }

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
+import { jwt_key } from './constant/jwt.constant';
+import { UserLoginRequestDTO } from 'src/users/dto/UserLoginRequestDTO';
 
 @Injectable()
 export class AuthService {
@@ -9,8 +11,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = this.usersService.authenticateUser(email, password);
+  async validateUser(userLoginRequestDTO: UserLoginRequestDTO): Promise<any> {
+    const user = await this.usersService.authenticateUser(userLoginRequestDTO);
     if (user) return user;
     return null;
   }
@@ -19,21 +21,24 @@ export class AuthService {
   async createAccessToken(user: any) {
     const payload = {
       type: 'accessToken',
-      username: user.email,
-      sub: user.userId,
+      email: user.email,
+      sub: user._id,
     };
     //JWT 표준과 일관성 유지를 위해 sub라는 속성 이름으로 userId를 보관
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign(payload, {
+      secret: jwt_key,
+      expiresIn: '100s',
+    });
     return accessToken;
   }
   async createRefreshToken(user: any) {
     const payload = {
       type: 'refreshToken',
-      username: user.username,
-      sub: user.userId,
+      email: user.email,
+      sub: user._id,
     };
     const token = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET,
+      secret: jwt_key,
       expiresIn: '20700m',
     });
 

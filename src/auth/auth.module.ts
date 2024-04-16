@@ -7,21 +7,20 @@ import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategy/local.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { jwt_key } from './constant/jwt.constant';
 
 @Module({
   imports: [
     PassportModule,
     ConfigModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: jwt_key,
       signOptions: { expiresIn: '300s' },
     }),
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtService],
-  //LocalStrategy 구현을 사용할 수 있도록 업데이트
+  providers: [AuthService, JwtService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
-  //내보내기
 })
 export class AuthModule {}

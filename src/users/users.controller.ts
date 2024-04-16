@@ -26,8 +26,8 @@ export class UsersController {
   @ApiBody({ type: UserJoinRequestDTO })
   @ApiResponse({ status: 201, description: '회원가입에 성공하였습니다' })
   @ApiResponse({ status: 404, description: '회원가입에 실패하였습니다' })
-  createUser(@Body() userInfo) {
-    return this.usersService.registerUser(userInfo);
+  createUser(@Body() userJoinRequestDTO: UserJoinRequestDTO) {
+    return this.usersService.joinUser(userJoinRequestDTO);
   }
 
   @Post('/login')
@@ -39,16 +39,14 @@ export class UsersController {
   @ApiResponse({ status: 200, description: '로그인 성공' })
   @ApiResponse({ status: 400, description: '존재하지 않는 이메일 입니다.' })
   @ApiResponse({ status: 401, description: '비밀번호가 일치하지 않습니다.' })
-  login(@Body() userInfo) {
-    return this.usersService.authenticateUser(
-      userInfo.email,
-      userInfo.password,
-    );
+  login(@Body() userLoginRequestDTO: UserLoginRequestDTO) {
+    return this.usersService.authenticateUser(userLoginRequestDTO);
   }
 
   @Get('/profile')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Body() userInfo) {
-    return userInfo;
+  getProfile(@Body() userId: string) {
+    const user = this.usersService.findUser(userId);
+    return user;
   }
 }

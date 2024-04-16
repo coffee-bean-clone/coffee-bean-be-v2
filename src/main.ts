@@ -9,16 +9,11 @@ async function bootstrap() {
     .setTitle('coffee-bean-API')
     .setDescription('description')
     .setVersion('1.0')
-    .addTag('tag')
+    .addTag('tag', 'description')
+    .addTag('tag2')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  // const config2 = new DocumentBuilder()
-  //   .setTitle('coffee-bean-API')
-  //   .setDescription('description')
-  //   .setVersion('1.0')
-  //   .addTag('tag')
-  //   .build();
-  // const document2 = SwaggerModule.createDocument(app, config2);
+
   SwaggerModule.setup('api', app, document);
   app.enableCors({
     origin: true,

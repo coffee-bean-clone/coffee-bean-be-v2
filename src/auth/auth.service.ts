@@ -31,6 +31,7 @@ export class AuthService {
     });
     return accessToken;
   }
+
   async createRefreshToken(user: any) {
     const payload = {
       type: 'refreshToken',
@@ -41,7 +42,6 @@ export class AuthService {
       secret: jwt_key,
       expiresIn: '20700m',
     });
-
     return token;
   }
 }

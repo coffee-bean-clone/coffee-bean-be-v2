@@ -12,6 +12,9 @@ import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
 import { UsersController } from './users/users.controller';
+import { ProductQuestionModule } from './product-question/product-question.module';
+import { ProductCartService } from './product-cart/product-cart.service';
+import { ProductCartModule } from './product-cart/product-cart.module';
 
 @Module({
   imports: [
@@ -21,8 +24,16 @@ import { UsersController } from './users/users.controller';
     AuthModule,
     ProductModule,
     CategoryModule,
+    ProductQuestionModule,
+    ProductCartModule,
   ],
   controllers: [AppController, AuthController, UsersController],
-  providers: [AppService, CategoryService, AuthService, JwtService],
+  providers: [
+    AppService,
+    CategoryService,
+    AuthService,
+    JwtService,
+    ProductCartService,
+  ],
 })
 export class AppModule {}

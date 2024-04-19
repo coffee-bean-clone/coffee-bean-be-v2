@@ -2,9 +2,11 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from 'src/users/users.service';
 import { LocalAuthGuard } from './guard/local-auth.guard';
-import { UserLoginRequestDTO } from 'src/users/dto/UserLoginRequestDTO';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { UserLoginRequestDTO } from 'src/users/dto/request/UserLoginRequestDTO';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserLoginResponseDTO } from 'src/users/dto/response/UserLoginResponseDTO';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -18,7 +20,11 @@ export class AuthController {
     description: '로그인에 성공하면 JWT를 반환합니다.',
   })
   @ApiBody({ type: UserLoginRequestDTO })
-  @ApiResponse({ status: 200, description: '로그인 성공' })
+  @ApiResponse({
+    status: 200,
+    description: '로그인 성공',
+    type: UserLoginResponseDTO,
+  })
   @ApiResponse({ status: 400, description: '존재하지 않는 이메일 입니다.' })
   @ApiResponse({ status: 401, description: '비밀번호가 일치하지 않습니다.' })
   @Post('/login')

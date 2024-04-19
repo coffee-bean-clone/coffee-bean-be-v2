@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { UserJoinRequestDTO } from './dto/UserJoinRequestDTO';
-import { UserLoginRequestDTO } from './dto/UserLoginRequestDTO';
+import { UserJoinRequestDTO } from './dto/request/UserJoinRequestDTO';
+import { UserLoginRequestDTO } from './dto/request/UserLoginRequestDTO';
 
 export class EmailNotFoundException extends Error {
   constructor(
@@ -78,8 +78,8 @@ export class UsersService {
       throw new BadRequestException('비밀번호가 일치하지 않습니다.');
     return user;
   }
-  async findUser(userId: string) {
-    const user = await this.userModel.findOne({ _id: userId });
+  async findUser(email: string) {
+    const user = await this.userModel.findOne({ email: email });
     if (!user) return null;
     return user;
   }

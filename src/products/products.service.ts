@@ -4,113 +4,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import products from './data/product.data';
 import { CategoryService } from 'src/category/category.service';
-interface Category {
-  endPoint: string;
-  categoryName: string;
-}
-@Injectable()
-export class MainCategoryService {
-  private readonly mainCategoris: Category[] = [
-    {
-      endPoint: 'stick_coffee',
-      categoryName: '스틱 커피',
-    },
-    {
-      endPoint: 'powder_coffee',
-      categoryName: '분쇄형 커피',
-    },
-    {
-      endPoint: '파우치&컵 커피',
-      categoryName: 'pouch_and_cup_coffee',
-    },
-    {
-      endPoint: '캡슐 커피',
-      categoryName: 'capsule_coffee',
-    },
-    {
-      endPoint: '티',
-      categoryName: 'tea',
-    },
-    {
-      endPoint: '상품',
-      categoryName: 'goods',
-    },
-  ];
-  findMainCategoryName(endPoint: string): string {
-    const match = this.mainCategoris.find(
-      (mainCategory) => mainCategory.endPoint === endPoint,
-    );
-    return match.categoryName;
-  }
-}
-@Injectable()
-export class SubCategoryService {
-  private readonly subCategorys: Category[] = [
-    {
-      endPoint: 'stick_coffee',
-      categoryName: '스틱 커피',
-    },
-    {
-      endPoint: 'powder_coffee',
-      categoryName: '분쇄형 커피',
-    },
-    {
-      endPoint: 'drip_bag',
-      categoryName: '드립백',
-    },
-    {
-      endPoint: 'pouch_coffee',
-      categoryName: '파우치 커피',
-    },
-    {
-      endPoint: 'cup_coffee',
-      categoryName: '컵 커피',
-    },
-    {
-      endPoint: 'nespresso',
-      categoryName: '네스프레소 호환용',
-    },
-    {
-      endPoint: 'cbtl',
-      categoryName: 'CBTL 호환용',
-    },
-    {
-      endPoint: 'classic_tea',
-      categoryName: '클래식 티',
-    },
-    {
-      endPoint: 'herbal_tea',
-      categoryName: '허브 티',
-    },
-    {
-      endPoint: 'fruit_tea',
-      categoryName: '프룻 티',
-    },
-    {
-      endPoint: 'ice_tumbler',
-      categoryName: '아이스 텀블러',
-    },
-    {
-      endPoint: 'warm_tumbler',
-      categoryName: '보온 텀블러',
-    },
-    {
-      endPoint: 'mug',
-      categoryName: '머그',
-    },
-  ];
-  findMainCategoryName(endPoint: string): string {
-    const match = this.subCategorys.find(
-      (subCategory) => subCategory.endPoint === endPoint,
-    );
-    return match.categoryName;
-  }
-}
+import { ProductQuestion } from './schemas/productQuestion.schema';
+import { ProductQuestionCreateDTO } from './dto/productQuestion/ProductQuestionCreateDTO';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
+    @InjectModel(ProductQuestion.name)
+    private readonly ProductQuestionModel: Model<ProductQuestion>,
+
     private readonly categoryService: CategoryService,
   ) {}
 
@@ -152,5 +55,33 @@ export class ProductService {
   }
   async deleteAll() {
     return this.productModel.deleteMany({}).exec();
+  }
+  async addProductQuestion(productQuestionCreateDTO: ProductQuestionCreateDTO) {
+    const question = new this.ProductQuestionModel({
+      ...productQuestionCreateDTO,
+      createdAt: new Date(),
+    });
+
+    return await question.save();
+  }
+
+  async findProductQuestion(productQuestionId: string) {
+    const question = await this.ProductQuestionModel.findOne({
+      _id: productQuestionId,
+    });
+    console.log(question);
+    return question;
+  }
+  async findProductQuestions(productId: string) {
+    const questions = await this.ProductQuestionModel.find({
+      productId: productId,
+    });
+    console.log(questions);
+    return questions;
+  }
+  async findUserCreatedProductQuestions(userId: string) {
+    const questions = await this.ProductQuestionModel.find({ userId: userId });
+    console.log(questions);
+    return questions;
   }
 }

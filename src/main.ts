@@ -5,12 +5,21 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = new DocumentBuilder()
-    .setTitle('coffee-bean-API')
-    .setDescription('description')
+    .setTitle('CoffeeBean API')
+    .setDescription('커피빈 클론을 위한 API 문서')
     .setVersion('1.0')
-    .addTag('tag', 'description')
-    .addTag('tag2')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        name: 'JWT',
+        description: 'Enter JWT',
+        in: 'header',
+      },
+      'token',
+    )
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api', app, document);

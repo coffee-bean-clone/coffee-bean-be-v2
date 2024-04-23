@@ -20,6 +20,11 @@ export class UserJoinRequestDTO extends UserLoginRequestDTO {
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({ example: '16274' })
+  zipCode: string;
+
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({ example: '010-1234-1234' })
   phoneNumber: string;
 }

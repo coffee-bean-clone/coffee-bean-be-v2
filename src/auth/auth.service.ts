@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { jwt_key } from './constant/jwt.constant';
 import { UserLoginRequestDTO } from 'src/users/dto/request/UserLoginRequestDTO';
 
 @Injectable()
@@ -26,7 +25,7 @@ export class AuthService {
     };
     //JWT 표준과 일관성 유지를 위해 sub라는 속성 이름으로 userId를 보관
     const accessToken = this.jwtService.sign(payload, {
-      secret: jwt_key,
+      secret: process.env.JWT_SECRET,
       expiresIn: '600s',
     });
     return accessToken;
@@ -39,7 +38,7 @@ export class AuthService {
       sub: user._id,
     };
     const token = this.jwtService.sign(payload, {
-      secret: jwt_key,
+      secret: process.env.JWT_SECRET,
       expiresIn: '20700m',
     });
     return token;

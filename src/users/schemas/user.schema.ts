@@ -15,6 +15,9 @@ export class User extends Document {
   @Prop({ required: true })
   address: string;
 
+  @Prop({ required: false })
+  detailAddress: string;
+
   @Prop({ required: true, unique: true })
   phoneNumber: string;
 }

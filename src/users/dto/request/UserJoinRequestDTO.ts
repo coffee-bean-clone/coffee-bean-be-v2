@@ -10,8 +10,13 @@ export class UserJoinRequestDTO extends UserLoginRequestDTO {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: '경기도 수원시 팔달구 우만동 110-1 101호' })
+  @ApiProperty({ example: '경기도 수원시 팔달구 우만동 110-1' })
   address: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ example: '101호' })
+  detailAddress: string;
 
   @IsString()
   @IsNotEmpty()

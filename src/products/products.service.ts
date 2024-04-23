@@ -70,6 +70,7 @@ export class ProductService {
       _id: productQuestionId,
     });
     console.log(question);
+
     return question;
   }
   async findProductQuestions(productId: string) {

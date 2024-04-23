@@ -56,11 +56,6 @@ export class ProductController {
     return this.productService.addProductQuestion(productCreateDTO);
   }
 
-  @Get('/question/:questionId')
-  getProductQuestion(@Param('qudstionId') questionId: string) {
-    return this.productService.findProductQuestion(questionId);
-  }
-
   @Get('/question/:userId')
   getUserCreatedProductQuestion(@Param('userId') userId: string) {
     return this.productService.findUserCreatedProductQuestions(userId);
@@ -69,5 +64,11 @@ export class ProductController {
   @Get('/question/:productId')
   getProductQuestions(@Param('productId') productId: string) {
     return this.productService.findProductQuestions(productId);
+  }
+
+  @Get('/question/:questionId')
+  getProductQuestion(@Param('questionId') questionId: string) {
+    console.log(questionId);
+    return this.productService.findProductQuestion(questionId);
   }
 }

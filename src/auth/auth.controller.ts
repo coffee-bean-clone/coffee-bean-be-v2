@@ -31,7 +31,8 @@ export class AuthController {
   async login(@Body() userLoginRequestDTO: UserLoginRequestDTO) {
     const user = await this.userService.authenticateUser(userLoginRequestDTO);
     if (!user) throw new Error('토큰 생성 실패');
-
-    return await this.authService.createAccessToken(user);
+    const token = await this.authService.createAccessToken(user);
+    const request = { isLoggedIn: true, token: token, userId: user._id };
+    return request;
   }
 }

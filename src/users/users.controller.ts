@@ -22,6 +22,7 @@ import { UserGetProfileRequestDTO } from './dto/request/UserGetProfileRequestDTO
 import { UserGetProfileResponse } from './dto/response/UserGetProfileResponseDTO';
 import { UserJoinResponseDTO } from './dto/response/UserJoinResponseDTO';
 import { UserLoginResponseDTO } from './dto/response/UserLoginResponseDTO';
+import { IsEmail, isPhoneNumber } from 'class-validator';
 
 @ApiTags('User')
 @Controller('users')
@@ -43,6 +44,34 @@ export class UsersController {
   @ApiResponse({ status: 404, description: '회원가입에 실패하였습니다' })
   createUser(@Body() userJoinRequestDTO: UserJoinRequestDTO) {
     return this.usersService.joinUser(userJoinRequestDTO);
+  }
+
+  @ApiOperation({
+    summary: '이메일 중복확인',
+  })
+  @ApiBody({ type: IsEmail() })
+  @ApiResponse({
+    status: 200,
+    description: '이메일 중복 확인 완료',
+    type: UserJoinResponseDTO,
+  })
+  @Post('/email_check')
+  emailCheck() {
+    return this.emailCheck();
+  }
+
+  @ApiOperation({
+    summary: '휴대폰 번호 중복확인',
+  })
+  @ApiBody({ type: isPhoneNumber })
+  @ApiResponse({
+    status: 200,
+    description: '휴대폰 번호 중복 확인 완료',
+    type: UserJoinResponseDTO,
+  })
+  @Post('/phone_number_check')
+  phoneNumberCheck() {
+    return this.phoneNumberCheck();
   }
 
   @Post('/login')

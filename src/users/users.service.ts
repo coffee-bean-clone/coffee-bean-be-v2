@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
@@ -39,18 +43,27 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(password, salt);
     return hashedPassword;
   }
-
-  async joinUser(userJoinRequestDTO: UserJoinRequestDTO) {
+  async emailCheck(email: string) {
     const isSameEmail = await this.userModel.findOne({
-      email: userJoinRequestDTO.email,
+      email: email,
     });
+    if (isSameEmail) throw new BadRequestException('동일한 이메일이 있습니다.');
+    return true;
+  }
+
+  async phoneNumberCheck(phoneNumber: string) {
     const isSamePhoneNumber = await this.userModel.findOne({
-      phoneNumber: userJoinRequestDTO.phoneNumber,
+      phoneNumber: phoneNumber,
     });
 
-    if (isSameEmail) throw new BadRequestException('동일한 이메일이 있습니다.');
     if (isSamePhoneNumber)
       throw new BadRequestException('동일한 휴대폰 번호가 있습니다.');
+    return true;
+  }
+
+  async joinUser(userJoinRequestDTO: UserJoinRequestDTO) {
+    await this.emailCheck(userJoinRequestDTO.email);
+    await this.phoneNumberCheck(userJoinRequestDTO.phoneNumber);
 
     try {
       const password = await this.hashingPassword(userJoinRequestDTO.password);
@@ -63,12 +76,13 @@ export class UsersService {
       throw new BadRequestException('통신 에러가 발생했습니다.');
     }
   }
+
   async authenticateUser(userLoginRequestDTO: UserLoginRequestDTO) {
     const user = await this.userModel.findOne({
       email: userLoginRequestDTO.email,
     });
 
-    if (!user) throw new BadRequestException('존재하지 않는 이메일 입니다.');
+    if (!user) throw new NotFoundException('존재하지 않는 이메일 입니다.');
 
     const isMatch = await this.comparePasswords(
       userLoginRequestDTO.password,
@@ -80,7 +94,7 @@ export class UsersService {
   }
   async findUser(email: string) {
     const user = await this.userModel.findOne({ email: email });
-    if (!user) return null;
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
     return user;
   }
 }

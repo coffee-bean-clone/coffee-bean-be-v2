@@ -9,19 +9,19 @@ export class User extends Document {
   @Prop({ required: true, minlength: 6 })
   password: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   address: string;
 
   @Prop({ required: false })
   detailAddress: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   zipCode: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: false, unique: true })
   phoneNumber: string;
 
   @Prop({ type: String, default: null })

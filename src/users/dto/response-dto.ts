@@ -21,3 +21,6 @@ export class UserLoginResponseDTO {
   @ApiProperty({ example: true })
   isLoggedIn: boolean;
 }
+export class RefreshTokenResponseDTO {}
+
+export class AccessTokenResponseDTO {}

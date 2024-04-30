@@ -18,6 +18,7 @@ import {
   ApiSwaggerOperation,
   ApiSwaggerTags,
 } from 'src/shared/decorators/swagger.decorator';
+import { JwtRefreshGuard } from 'src/auth/guard/jwt-refresh.guard';
 
 @ApiSwaggerTags('User')
 @Controller('users')
@@ -73,6 +74,48 @@ export class UsersController {
     const isLoggedIn = true;
     const { email, name } = user;
     return { accessToken, refreshToken, email, name, isLoggedIn };
+  }
+
+  @UseGuards(JwtRefreshGuard)
+  @Get('/auth/access-token')
+  @ApiSwaggerOperation(
+    'Access Token 가져오기',
+    '유저의 이메일을 통해 Access Token을 가져옵니다.',
+  )
+  @ApiSwaggerApiBody(REQ.UserLoginRequestDTO)
+  @ApiSwaggerApiResponse(
+    HttpStatus.OK,
+    'Access Token을 성공적으로 가져왔습니다.',
+    RES.AccessTokenResponseDTO,
+  )
+  @ApiSwaggerApiResponse(HttpStatus.BAD_REQUEST, '존재하지 않는 이메일 입니다.')
+  @ApiSwaggerApiResponse(HttpStatus.NOT_FOUND, '비밀번호가 일치하지 않습니다.')
+  async getAccessToken(@Body() userLoginRequestDTO: REQ.UserLoginRequestDTO) {
+    const user = await this.usersService.findUser(userLoginRequestDTO.email);
+    const accessToken = await this.authService.createAccessToken(user);
+    return { accessToken };
+  }
+
+  @UseGuards(JwtRefreshGuard)
+  @Get('/auth/refresh-token')
+  @ApiSwaggerOperation(
+    'Refresh Token 재발급',
+    '유저의 이메일을 통해 Refresh Token을 재발급합니다.',
+  )
+  @ApiSwaggerApiBody(REQ.UserLoginRequestDTO)
+  @ApiSwaggerApiResponse(
+    HttpStatus.OK,
+    'Refresh Token을 성공적으로 재발급하였습니다.',
+    RES.RefreshTokenResponseDTO,
+  )
+  @ApiSwaggerApiResponse(HttpStatus.BAD_REQUEST, '존재하지 않는 이메일 입니다.')
+  @ApiSwaggerApiResponse(HttpStatus.NOT_FOUND, '비밀번호가 일치하지 않습니다.')
+  async reissueRefreshToken(
+    @Body() userLoginRequestDTO: REQ.UserLoginRequestDTO,
+  ) {
+    const user = await this.usersService.findUser(userLoginRequestDTO.email);
+    console.log(user);
+    return await this.authService.reissueRefreshToken(user);
   }
 
   @Get('/profile')

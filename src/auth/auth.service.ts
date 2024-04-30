@@ -64,6 +64,7 @@ export class AuthService {
     return { refreshToken, tokenExp };
   }
   async tokenValidate(token: string) {
+    console.log(token);
     return await this.jwtService.verify(token, {
       secret: process.env.JWT_SECRET,
     });

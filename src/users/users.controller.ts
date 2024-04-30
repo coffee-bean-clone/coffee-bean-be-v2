@@ -45,7 +45,15 @@ export class UsersController {
   @ApiSwaggerApiBody(REQ.PhoneNumberCheckDTO)
   @ApiSwaggerApiResponse(HttpStatus.OK, '휴대폰 번호 중복 확인 완료')
   phoneNumberCheck(@Body() phoneNumberCheckDTO: REQ.PhoneNumberCheckDTO) {
-    return this.usersService.emailCheck(phoneNumberCheckDTO.phoneNumber);
+    return this.usersService.phoneNumberCheck(phoneNumberCheckDTO.phoneNumber);
+  }
+
+  @Post('/email_check')
+  @ApiSwaggerOperation('이메일 중복확인')
+  @ApiSwaggerApiBody(REQ.EmailCheckDTO)
+  @ApiSwaggerApiResponse(HttpStatus.OK, '이메일 중복 확인 완료')
+  emailCheck(@Body() email: string) {
+    return this.usersService.emailCheck(email);
   }
 
   @UseGuards(LocalAuthGuard)

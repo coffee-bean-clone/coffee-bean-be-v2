@@ -11,12 +11,14 @@ import { ProductService } from './products.service';
 import { ApiTags } from '@nestjs/swagger';
 import { ProductQuestionCreateDTO } from './dto/productQuestion/ProductQuestionCreateDTO';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { Public } from 'src/shared/decorators/public.decorator';
 
 @ApiTags('Product')
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
   @Get('/all')
+  @Public()
   getAllProducts() {
     return this.productService.findAll();
   }

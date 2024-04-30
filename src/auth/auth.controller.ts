@@ -25,8 +25,8 @@ export class AuthController {
     description: '로그인 성공',
     type: UserLoginResponseDTO,
   })
-  @ApiResponse({ status: 400, description: '존재하지 않는 이메일 입니다.' })
-  @ApiResponse({ status: 401, description: '비밀번호가 일치하지 않습니다.' })
+  @ApiResponse({ status: 405, description: '존재하지 않는 이메일 입니다.' })
+  @ApiResponse({ status: 400, description: '비밀번호가 일치하지 않습니다.' })
   @Post('/login')
   async login(@Body() userLoginRequestDTO: UserLoginRequestDTO) {
     const user = await this.userService.authenticateUser(userLoginRequestDTO);

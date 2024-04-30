@@ -9,6 +9,7 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { UserJoinRequestDTO } from './dto/request/UserJoinRequestDTO';
 import { UserLoginRequestDTO } from './dto/request/UserLoginRequestDTO';
+import { Err } from 'src/shared/error';
 
 export class EmailNotFoundException extends Error {
   constructor(
@@ -96,5 +97,13 @@ export class UsersService {
     const user = await this.userModel.findOne({ email: email });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
     return user;
+  }
+  async findUserById(id: string) {
+    const existingUser = await this.userModel.findById(id);
+    if (!existingUser) {
+      throw new BadRequestException(Err.USER.NOT_FOUND);
+    }
+
+    return existingUser;
   }
 }

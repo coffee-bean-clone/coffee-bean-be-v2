@@ -15,11 +15,13 @@ import { UsersController } from './users/users.controller';
 import { ProductQuestionModule } from './product-question/product-question.module';
 import { ProductCartService } from './product-cart/product-cart.service';
 import { ProductCartModule } from './product-cart/product-cart.module';
+import { UserSchema } from './users/schemas/user.schema';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URL),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     UsersModule,
     AuthModule,
     ProductModule,

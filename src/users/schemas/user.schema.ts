@@ -23,6 +23,9 @@ export class User extends Document {
 
   @Prop({ required: true, unique: true })
   phoneNumber: string;
+
+  @Prop({ type: String, default: null })
+  refreshToken: string | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

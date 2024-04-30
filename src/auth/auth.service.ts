@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { UserLoginRequestDTO } from 'src/users/dto/request/UserLoginRequestDTO';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
 import { Err } from 'src/shared/error';
-
+import * as CryptoJS from 'crypto-js';
+import { REQ } from 'src/users/dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,7 +15,9 @@ export class AuthService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  async validateUser(userLoginRequestDTO: UserLoginRequestDTO): Promise<any> {
+  async validateUser(
+    userLoginRequestDTO: REQ.UserLoginRequestDTO,
+  ): Promise<any> {
     const user = await this.usersService.authenticateUser(userLoginRequestDTO);
     if (user) return user;
     return null;

@@ -7,25 +7,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { UserJoinRequestDTO } from './dto/request/UserJoinRequestDTO';
-import { UserLoginRequestDTO } from './dto/request/UserLoginRequestDTO';
 import { Err } from 'src/shared/error';
-
-export class EmailNotFoundException extends Error {
-  constructor(
-    message: string = 'User with the provided email does not exist.',
-  ) {
-    super(message);
-    this.name = 'EmailNotFoundException';
-  }
-}
-
-export class InvalidPasswordException extends Error {
-  constructor(message: string = 'The provided password is incorrect.') {
-    super(message);
-    this.name = 'InvalidPasswordException';
-  }
-}
+import { REQ } from './dto';
 
 @Injectable()
 export class UsersService {
@@ -62,7 +45,7 @@ export class UsersService {
     return true;
   }
 
-  async joinUser(userJoinRequestDTO: UserJoinRequestDTO) {
+  async localJoin(userJoinRequestDTO: REQ.UserJoinRequestDTO) {
     await this.emailCheck(userJoinRequestDTO.email);
     await this.phoneNumberCheck(userJoinRequestDTO.phoneNumber);
 
@@ -78,7 +61,7 @@ export class UsersService {
     }
   }
 
-  async authenticateUser(userLoginRequestDTO: UserLoginRequestDTO) {
+  async authenticateUser(userLoginRequestDTO: REQ.UserLoginRequestDTO) {
     const user = await this.userModel.findOne({
       email: userLoginRequestDTO.email,
     });
@@ -103,7 +86,6 @@ export class UsersService {
     if (!existingUser) {
       throw new BadRequestException(Err.USER.NOT_FOUND);
     }
-
     return existingUser;
   }
 }

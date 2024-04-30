@@ -2,111 +2,80 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
   HttpStatus,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { UserJoinRequestDTO } from './dto/request/UserJoinRequestDTO';
-import { UserLoginRequestDTO } from './dto/request/UserLoginRequestDTO';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
-import { UserGetProfileRequestDTO } from './dto/request/UserGetProfileRequestDTO';
-import { UserGetProfileResponse } from './dto/response/UserGetProfileResponseDTO';
-import { UserJoinResponseDTO } from './dto/response/UserJoinResponseDTO';
-import { UserLoginResponseDTO } from './dto/response/UserLoginResponseDTO';
-import { IsEmail, isPhoneNumber } from 'class-validator';
+import { LocalAuthGuard } from 'src/auth/guard/local-auth.guard';
+import { AuthService } from 'src/auth/auth.service';
+import { UsersService } from './users.service';
+import { REQ, RES } from './dto';
+import {
+  ApiSwaggerApiBody,
+  ApiSwaggerApiResponse,
+  ApiSwaggerBearerAuth,
+  ApiSwaggerOperation,
+  ApiSwaggerTags,
+} from 'src/shared/decorators/swagger.decorator';
 
-@ApiTags('User')
+@ApiSwaggerTags('User')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
 
-  @HttpCode(HttpStatus.OK)
   @Post('/join')
-  @ApiOperation({
-    summary: '회원가입',
-    description: '사용자 정보를 추가합니다.',
-  })
-  @ApiBody({ type: UserJoinRequestDTO })
-  @ApiResponse({
-    status: 200,
-    description: '회원가입에 성공하였습니다',
-    type: UserJoinResponseDTO,
-  })
-  @ApiResponse({ status: 404, description: '회원가입에 실패하였습니다' })
-  createUser(@Body() userJoinRequestDTO: UserJoinRequestDTO) {
-    return this.usersService.joinUser(userJoinRequestDTO);
+  @ApiSwaggerOperation('회원가입', '사용자 정보를 추가합니다.')
+  @ApiSwaggerApiBody(REQ.UserJoinRequestDTO)
+  @ApiSwaggerApiResponse(
+    HttpStatus.OK,
+    '회원가입에 성공하였습니다',
+    RES.UserJoinResponseDTO,
+  )
+  @ApiSwaggerApiResponse(HttpStatus.NOT_FOUND, '회원가입에 실패하였습니다')
+  localJoin(@Body() userJoinRequestDTO: REQ.UserJoinRequestDTO) {
+    return this.usersService.localJoin(userJoinRequestDTO);
   }
 
-  @ApiOperation({
-    summary: '이메일 중복확인',
-  })
-  @ApiBody({ type: IsEmail() })
-  @ApiResponse({
-    status: 200,
-    description: '이메일 중복 확인 완료',
-    type: UserJoinResponseDTO,
-  })
-  @Post('/email_check')
-  emailCheck() {
-    return this.emailCheck();
-  }
-
-  @ApiOperation({
-    summary: '휴대폰 번호 중복확인',
-  })
-  @ApiBody({ type: isPhoneNumber })
-  @ApiResponse({
-    status: 200,
-    description: '휴대폰 번호 중복 확인 완료',
-    type: UserJoinResponseDTO,
-  })
   @Post('/phone_number_check')
-  phoneNumberCheck() {
-    return this.phoneNumberCheck();
+  @ApiSwaggerOperation('휴대폰 번호 중복확인')
+  @ApiSwaggerApiBody(REQ.PhoneNumberCheckDTO)
+  @ApiSwaggerApiResponse(HttpStatus.OK, '휴대폰 번호 중복 확인 완료')
+  phoneNumberCheck(@Body() phoneNumberCheckDTO: REQ.PhoneNumberCheckDTO) {
+    return this.usersService.emailCheck(phoneNumberCheckDTO.phoneNumber);
   }
 
-  @Post('/login')
-  @ApiOperation({
-    summary: '로그인 (테스트)',
-    description: '사용자를 인증 후 로그인 여부를 반환합니다.',
-  })
-  @ApiBody({ type: UserLoginRequestDTO })
-  @ApiResponse({
-    status: 200,
-    description: '로그인 성공',
-    type: UserLoginResponseDTO,
-  })
-  @ApiResponse({ status: 400, description: '존재하지 않는 이메일 입니다.' })
-  @ApiResponse({ status: 401, description: '비밀번호가 일치하지 않습니다.' })
-  login(@Body() userLoginRequestDTO: UserLoginRequestDTO) {
-    return this.usersService.authenticateUser(userLoginRequestDTO);
+  @UseGuards(LocalAuthGuard)
+  @Post('/auth/login')
+  @ApiSwaggerApiResponse(HttpStatus.BAD_REQUEST, '존재하지 않는 이메일 입니다.')
+  @ApiSwaggerApiResponse(HttpStatus.NOT_FOUND, '비밀번호가 일치하지 않습니다.')
+  @ApiSwaggerOperation(
+    '로그인',
+    '사용자를 인증 후 accessToken과 refreshToken을 반환합니다.',
+  )
+  @ApiSwaggerApiBody(REQ.UserLoginRequestDTO)
+  @ApiSwaggerApiResponse(HttpStatus.OK, '로그인 성공', RES.UserLoginResponseDTO)
+  async login(@Body() userLoginRequestDTO: REQ.UserLoginRequestDTO) {
+    const user = await this.usersService.findUser(userLoginRequestDTO.email);
+    const accessToken = await this.authService.createAccessToken(user);
+    const refreshToken = await this.authService.createRefreshToken(user);
+    const isLoggedIn = true;
+    const { email, name } = user;
+    return { accessToken, refreshToken, email, name, isLoggedIn };
   }
 
   @Get('/profile')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({
-    summary: '프로필',
-    description: '인가에 성공하면 유저 정보를 반환합니다.',
-  })
-  @ApiBody({ type: UserGetProfileRequestDTO })
-  @ApiBearerAuth('token')
-  @ApiResponse({
-    status: 200,
-    description: '성공',
-    type: UserGetProfileResponse,
-  })
-  @ApiResponse({ status: 400, description: '없는 유저입니다.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getProfile(@Body() request: UserGetProfileRequestDTO) {
+  @ApiSwaggerOperation('프로필', '인가에 성공하면 유저 정보를 반환합니다.')
+  @ApiSwaggerApiBody(REQ.UserGetProfileRequestDTO)
+  @ApiSwaggerBearerAuth()
+  @ApiSwaggerApiResponse(HttpStatus.OK, '성공', RES.UserGetProfileResponse)
+  @ApiSwaggerApiResponse(HttpStatus.BAD_REQUEST, '없는 유저입니다.')
+  @ApiSwaggerApiResponse(HttpStatus.UNAUTHORIZED, 'Unauthorized')
+  async getProfile(@Body() request: REQ.UserGetProfileRequestDTO) {
     const { email } = request;
     const user = await this.usersService.findUser(email);
     if (!user) return '없는 유저입니다.';

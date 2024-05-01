@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -118,7 +119,7 @@ export class UsersController {
     return await this.authService.reissueRefreshToken(user);
   }
 
-  @Get('/profile')
+  @Get('/profile/:email')
   @UseGuards(JwtAuthGuard)
   @ApiSwaggerOperation('프로필', '인가에 성공하면 유저 정보를 반환합니다.')
   @ApiSwaggerApiBody(REQ.UserGetProfileRequestDTO)
@@ -126,8 +127,8 @@ export class UsersController {
   @ApiSwaggerApiResponse(HttpStatus.OK, '성공', RES.UserGetProfileResponse)
   @ApiSwaggerApiResponse(HttpStatus.BAD_REQUEST, '없는 유저입니다.')
   @ApiSwaggerApiResponse(HttpStatus.UNAUTHORIZED, 'Unauthorized')
-  async getProfile(@Body() request: REQ.UserGetProfileRequestDTO) {
-    const { email } = request;
+  async getProfile(@Param('email') email: string) {
+    console.log(email);
     const user = await this.usersService.findUser(email);
     if (!user) return '없는 유저입니다.';
     return user;

@@ -17,6 +17,8 @@ import { REQ } from './dto';
 import {
   ApiSwaggerApiBody,
   ApiSwaggerApiParam,
+  ApiSwaggerBearerAuth,
+  ApiSwaggerOperation,
 } from 'src/shared/decorators/swagger.decorator';
 
 @ApiTags('Product')
@@ -65,6 +67,7 @@ export class ProductController {
 
   @Post('/question/add')
   @UseGuards(JwtAuthGuard)
+  @ApiSwaggerBearerAuth()
   @ApiSwaggerApiBody(REQ.ProductQuestionCreateDTO)
   async addProductQuestion(
     @Body() productCreateDTO: REQ.ProductQuestionCreateDTO,
@@ -75,6 +78,7 @@ export class ProductController {
   }
 
   @Get('/question/:userId')
+  @ApiSwaggerOperation('유저가 작성한 문의')
   async findUserProductQuestions(@Param('userId') userId: string) {
     const result =
       await this.productQuestionService.findUserProductQuestions(userId);
@@ -82,6 +86,7 @@ export class ProductController {
   }
 
   @Get('/question/:productId')
+  @ApiSwaggerOperation('상품 별 문의')
   async findProductQuestionsByProduct(@Param('productId') productId: string) {
     const result =
       await this.productQuestionService.findProductQuestionsByProduct(
@@ -91,6 +96,7 @@ export class ProductController {
   }
 
   @Get('/question/:questionId')
+  @ApiSwaggerOperation('상품문의 상세보기')
   async findProductQuestionDetail(@Param('questionId') questionId: string) {
     const result =
       await this.productQuestionService.findProductQuestionDetail(questionId);
@@ -99,6 +105,7 @@ export class ProductController {
 
   @Delete('/question/remove/:questionId')
   @UseGuards(JwtAuthGuard)
+  @ApiSwaggerBearerAuth()
   async removeProductQuestion(@Param('questionId') questionId: string) {
     const result =
       await this.productQuestionService.removeProductQuestion(questionId);
@@ -107,27 +114,35 @@ export class ProductController {
 
   @Post('/cart/add')
   @UseGuards(JwtAuthGuard)
+  @ApiSwaggerBearerAuth()
   @ApiSwaggerApiBody(REQ.ProcuctCartAddDTO)
   async addProductCart(@Body() productCartAddDTO: REQ.ProcuctCartAddDTO) {
-    await this.productCartService.addProductCart(productCartAddDTO);
-    return { isSucces: true };
+    const result =
+      await this.productCartService.addProductCart(productCartAddDTO);
+    if (!result) throw Error('장바구니 등록 실패');
+    return { isSucces: true, result: result };
   }
 
   @Get('/cart/:userId')
   @ApiSwaggerApiParam('userId', '660bb5864146c96c02c47978')
   async findProductCartsByUser(@Param('userId') userId: string) {
     await this.productCartService.findProductCartsByUser(userId);
+    return { isSucces: true };
   }
   @Get('/cart/:productId')
   @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
   async findProductCartsByProduct(@Param('productId') productId: string) {
     await this.productCartService.findProductCartsByProduct(productId);
+    return { isSucces: true };
   }
 
-  @Delete('/cart/:_id')
+  @Delete('/cart/remove/:_id')
   @UseGuards(JwtAuthGuard)
+  @ApiSwaggerBearerAuth()
   @ApiSwaggerApiParam('_id', '6632d79507e2c27d8abf9fe9')
   async removeProductCart(@Param('_id') _id: string) {
-    await this.removeProductCart(_id);
+    const result = await this.productCartService.removeProductCart(_id);
+    if (!result) throw Error('장바구니 삭제 실패');
+    return { isSucces: true, result: result };
   }
 }

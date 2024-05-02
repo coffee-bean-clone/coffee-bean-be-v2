@@ -6,9 +6,10 @@ import {
   Param,
   UseGuards,
   Body,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './products.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/shared/decorators/public.decorator';
 import { ProductQuestionService } from 'src/product-question/product-question.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
@@ -29,6 +30,31 @@ export class ProductController {
     private readonly productQuestionService: ProductQuestionService,
     private readonly productCartService: ProductCartService,
   ) {}
+
+  @Get('')
+  @ApiQuery({
+    name: 'limit',
+    example: 10,
+    description: `
+    몇개의 상품을 가져올지 지정합니다.
+    지정하지 않을 시 10으로 고정 됩니다.
+    `,
+  })
+  @ApiQuery({
+    name: 'cursor',
+    required: false,
+    example: null,
+    description:
+      '마지막 요소의 id 전달하면 그 다음으로부터 limit개 만큼의 상품을 반환합니다.',
+  })
+  async findCursor(
+    @Query('limit') limit: number,
+    @Query('cursor') cursor?: string,
+  ) {
+    const result = await this.productService.findCursor(limit, cursor);
+    return result;
+  }
+
   @Get('/all')
   @Public()
   async findAll() {

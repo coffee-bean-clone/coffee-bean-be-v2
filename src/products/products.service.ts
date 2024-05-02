@@ -16,6 +16,11 @@ export class ProductService {
     private readonly categoryService: CategoryService,
   ) {}
 
+  async findCursor(limit: number = 10, cursor: string = null) {
+    const query = cursor ? { _id: { $gt: cursor } } : {};
+    return this.productModel.find(query).limit(limit).sort({ _id: 1 }).exec();
+  }
+
   getAllProducts() {
     return 'getAllProducts';
   }

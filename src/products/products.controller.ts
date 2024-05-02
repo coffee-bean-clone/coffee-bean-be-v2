@@ -32,6 +32,10 @@ export class ProductController {
   ) {}
 
   @Get('')
+  @ApiSwaggerOperation(
+    '무한스크롤 상품 불러오기',
+    '마지막 id를 이용해서 limit개 만큼의 상품을 반환합니다.',
+  )
   @ApiQuery({
     name: 'limit',
     example: 10,
@@ -141,6 +145,7 @@ export class ProductController {
   @Post('/cart/add')
   @UseGuards(JwtAuthGuard)
   @ApiSwaggerBearerAuth()
+  @ApiSwaggerOperation('장바구니 추가')
   @ApiSwaggerApiBody(REQ.ProcuctCartAddDTO)
   async addProductCart(@Body() productCartAddDTO: REQ.ProcuctCartAddDTO) {
     const result =
@@ -151,20 +156,29 @@ export class ProductController {
 
   @Get('/cart/:userId')
   @ApiSwaggerApiParam('userId', '660bb5864146c96c02c47978')
+  @ApiSwaggerOperation('유저의 장바구니')
   async findProductCartsByUser(@Param('userId') userId: string) {
-    await this.productCartService.findProductCartsByUser(userId);
-    return { isSucces: true };
+    const result = await this.productCartService.findProductCartsByUser(userId);
+    if (result.length === 0)
+      return { isEmpty: true, result, length: result.length };
+    return { isSucces: true, result, length: result.length };
   }
+
   @Get('/cart/:productId')
   @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
+  @ApiSwaggerOperation('상품 별 장바구니 ???')
   async findProductCartsByProduct(@Param('productId') productId: string) {
-    await this.productCartService.findProductCartsByProduct(productId);
-    return { isSucces: true };
+    const result =
+      await this.productCartService.findProductCartsByProduct(productId);
+    if (result.length === 0)
+      return { isEmpty: true, result, length: result.length };
+    return { isSucces: true, result, length: result.length };
   }
 
   @Delete('/cart/remove/:_id')
   @UseGuards(JwtAuthGuard)
   @ApiSwaggerBearerAuth()
+  @ApiSwaggerOperation('장바구니 삭제')
   @ApiSwaggerApiParam('_id', '6632d79507e2c27d8abf9fe9')
   async removeProductCart(@Param('_id') _id: string) {
     const result = await this.productCartService.removeProductCart(_id);

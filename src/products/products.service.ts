@@ -4,8 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import products from './data/product.data';
 import { CategoryService } from 'src/category/category.service';
-import { ProductQuestion } from './schemas/productQuestion.schema';
-import { ProductQuestionCreateDTO } from './dto/productQuestion/ProductQuestionCreateDTO';
+import { ProductQuestion } from './schemas/product-question.schema';
 
 @Injectable()
 export class ProductService {
@@ -55,34 +54,5 @@ export class ProductService {
   }
   async deleteAll() {
     return this.productModel.deleteMany({}).exec();
-  }
-  async addProductQuestion(productQuestionCreateDTO: ProductQuestionCreateDTO) {
-    const question = new this.ProductQuestionModel({
-      ...productQuestionCreateDTO,
-      createdAt: new Date(),
-    });
-
-    return await question.save();
-  }
-
-  async findProductQuestion(productQuestionId: string) {
-    const question = await this.ProductQuestionModel.findOne({
-      _id: productQuestionId,
-    });
-    console.log(question);
-
-    return question;
-  }
-  async findProductQuestions(productId: string) {
-    const questions = await this.ProductQuestionModel.find({
-      productId: productId,
-    });
-    console.log(questions);
-    return questions;
-  }
-  async findUserCreatedProductQuestions(userId: string) {
-    const questions = await this.ProductQuestionModel.find({ userId: userId });
-    console.log(questions);
-    return questions;
   }
 }

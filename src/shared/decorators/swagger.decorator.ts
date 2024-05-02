@@ -4,6 +4,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiParam,
 } from '@nestjs/swagger';
 
 export const ApiSwaggerTags = (name: string) => ApiTags(name);
@@ -21,4 +22,5 @@ export const ApiSwaggerApiBody = (type: any) => ApiBody({ type });
 
 export const ApiSwaggerBearerAuth = () => ApiBearerAuth();
 
-// export const ApiSwaggerApiParam = (type: any) => ApiParam({ type });
+export const ApiSwaggerApiParam = (name: string, example: string) =>
+  ApiParam({ name: name, example: example });

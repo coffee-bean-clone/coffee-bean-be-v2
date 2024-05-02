@@ -112,16 +112,27 @@ export class ProductController {
     return result;
   }
 
-  @Get('/question/:userId')
+  @Get('/question/:questionId')
+  @ApiSwaggerOperation('상품문의 상세보기')
+  @ApiSwaggerApiParam('questionId', '6633711bcd91a645f9d07552')
+  async findProductQuestionDetail(@Param('questionId') questionId: string) {
+    const result =
+      await this.productQuestionService.findProductQuestionDetail(questionId);
+    return result;
+  }
+
+  @Get('/question/user/:userId')
   @ApiSwaggerOperation('유저가 작성한 문의')
+  @ApiSwaggerApiParam('userId', '662744d18d85bb735ab5dc32')
   async findUserProductQuestions(@Param('userId') userId: string) {
     const result =
       await this.productQuestionService.findUserProductQuestions(userId);
     return result;
   }
 
-  @Get('/question/:productId')
+  @Get('/question/product/:productId')
   @ApiSwaggerOperation('상품 별 문의')
+  @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
   async findProductQuestionsByProduct(@Param('productId') productId: string) {
     const result =
       await this.productQuestionService.findProductQuestionsByProduct(
@@ -130,17 +141,10 @@ export class ProductController {
     return result;
   }
 
-  @Get('/question/:questionId')
-  @ApiSwaggerOperation('상품문의 상세보기')
-  async findProductQuestionDetail(@Param('questionId') questionId: string) {
-    const result =
-      await this.productQuestionService.findProductQuestionDetail(questionId);
-    return result;
-  }
-
   @Delete('/question/remove/:questionId')
   @UseGuards(JwtAuthGuard)
   @ApiSwaggerBearerAuth()
+  @ApiSwaggerApiParam('questionId', '6633711bcd91a645f9d07552')
   async removeProductQuestion(@Param('questionId') questionId: string) {
     const result =
       await this.productQuestionService.removeProductQuestion(questionId);
@@ -171,26 +175,26 @@ export class ProductController {
     return { isSucces: true, result, length: result.length };
   }
 
-  @Get('/cart/:userId/:productId')
-  @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
-  @ApiSwaggerOperation('상품 별 장바구니 ??? 무슨필요')
-  async find(@Param('productId') productId: string) {
-    const result =
-      await this.productCartService.findProductCartsByProduct(productId);
-    if (result.length === 0)
-      return { isEmpty: true, result, length: result.length };
-    return { isSucces: true, result, length: result.length };
-  }
-  @Get('/cart/:productId')
-  @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
-  @ApiSwaggerOperation('상품 별 장바구니 ??? 무슨필요')
-  async findProductCartsByProduct(@Param('productId') productId: string) {
-    const result =
-      await this.productCartService.findProductCartsByProduct(productId);
-    if (result.length === 0)
-      return { isEmpty: true, result, length: result.length };
-    return { isSucces: true, result, length: result.length };
-  }
+  // @Get('/cart/:userId/:productId')
+  // @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
+  // @ApiSwaggerOperation('상품 별 장바구니 ??? 무슨필요')
+  // async find(@Param('productId') productId: string) {
+  //   const result =
+  //     await this.productCartService.findProductCartsByProduct(productId);
+  //   if (result.length === 0)
+  //     return { isEmpty: true, result, length: result.length };
+  //   return { isSucces: true, result, length: result.length };
+  // }
+  // @Get('/cart/:productId')
+  // @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
+  // @ApiSwaggerOperation('상품 별 장바구니 ??? 무슨필요')
+  // async findProductCartsByProduct(@Param('productId') productId: string) {
+  //   const result =
+  //     await this.productCartService.findProductCartsByProduct(productId);
+  //   if (result.length === 0)
+  //     return { isEmpty: true, result, length: result.length };
+  //   return { isSucces: true, result, length: result.length };
+  // }
 
   @Delete('/cart/remove/:userId/:productId')
   @UseGuards(JwtAuthGuard)

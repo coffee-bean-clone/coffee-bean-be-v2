@@ -37,10 +37,6 @@ export class ProductCartService {
       { new: true }, // 갱신된 문서를 반환
     );
 
-    // if (!result) {
-    //   throw new Error('장바구니에서 해당 상품을 찾을 수 없습니다.');
-    // }
-
     return result;
   }
   async findProductCartsByUser(userId: string) {

@@ -18,10 +18,10 @@ export class ProductQuestion extends Document {
   @Prop({ required: true, type: Date })
   createdAt: Date | null;
 
-  @Prop({ required: true, type: Date })
+  @Prop({ required: false, type: Date })
   updateAt: Date | null;
 
-  @Prop({ required: true, type: Date })
+  @Prop({ required: false, type: Date })
   deleteAt: Date | null;
 }
 

@@ -20,20 +20,20 @@ export class ProductQuestionService {
     return await question.save();
   }
 
-  async findUserProductQuestions(productQuestionId: string) {
-    const question = await this.productQuestionModel.findOne({
-      _id: productQuestionId,
+  async findUserProductQuestions(userId: string) {
+    const question = await this.productQuestionModel.find({
+      userId: userId,
     });
     return question;
   }
-  async findProductQuestionsByProduct(userId: string) {
-    const questions = await this.productQuestionModel.find({ userId: userId });
-    return questions;
-  }
-  async findProductQuestionDetail(productId: string) {
+  async findProductQuestionsByProduct(productId: string) {
     const questions = await this.productQuestionModel.find({
       productId: productId,
     });
+    return questions;
+  }
+  async findProductQuestionDetail(questionId: string) {
+    const questions = await this.productQuestionModel.findById(questionId);
     return questions;
   }
   async removeProductQuestion(questionId: string) {

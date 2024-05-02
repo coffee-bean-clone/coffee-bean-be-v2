@@ -12,13 +12,23 @@ export class ProductCartService {
   ) {}
 
   async addProductCart(productCartAddDTO: REQ.ProcuctCartAddDTO) {
-    const cart = new this.productCartModel({
+    const prevCart = await this.productCartModel.findOne({
       userId: productCartAddDTO.userId,
       productId: productCartAddDTO.productId,
-      createAt: new Date(),
     });
-    if (!cart) throw Error('cart 생성 실패');
-    const result = await cart.save();
+    if (!prevCart) {
+      const newCart = new this.productCartModel({
+        userId: productCartAddDTO.userId,
+        productId: productCartAddDTO.productId,
+        createAt: new Date(),
+        quantity: 1,
+      });
+      if (!newCart) throw Error('cart 생성 실패');
+      const result = await newCart.save();
+      return result;
+    }
+    prevCart.quantity += 1;
+    const result = await prevCart.save();
     return result;
   }
   async removeProductCart(_id: string) {

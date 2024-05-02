@@ -47,9 +47,11 @@ export class ProductController {
   @ApiQuery({
     name: 'cursor',
     required: false,
-    example: null,
-    description:
-      '마지막 요소의 id 전달하면 그 다음으로부터 limit개 만큼의 상품을 반환합니다.',
+    example: null || '65fc29dc3f95892a6c88d391',
+    description: `
+    마지막 요소의 id 전달하면,
+    그 다음으로부터 limit개 만큼의 상품을 반환합니다.
+     `,
   })
   async findCursor(
     @Query('limit') limit: number,
@@ -164,9 +166,19 @@ export class ProductController {
     return { isSucces: true, result, length: result.length };
   }
 
+  @Get('/cart/:userId/:productId')
+  @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
+  @ApiSwaggerOperation('상품 별 장바구니 ??? 무슨필요')
+  async find(@Param('productId') productId: string) {
+    const result =
+      await this.productCartService.findProductCartsByProduct(productId);
+    if (result.length === 0)
+      return { isEmpty: true, result, length: result.length };
+    return { isSucces: true, result, length: result.length };
+  }
   @Get('/cart/:productId')
   @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
-  @ApiSwaggerOperation('상품 별 장바구니 ???')
+  @ApiSwaggerOperation('상품 별 장바구니 ??? 무슨필요')
   async findProductCartsByProduct(@Param('productId') productId: string) {
     const result =
       await this.productCartService.findProductCartsByProduct(productId);
@@ -176,13 +188,13 @@ export class ProductController {
   }
 
   @Delete('/cart/remove/:_id')
-  @UseGuards(JwtAuthGuard)
-  @ApiSwaggerBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiSwaggerBearerAuth()
   @ApiSwaggerOperation('장바구니 삭제')
   @ApiSwaggerApiParam('_id', '6632d79507e2c27d8abf9fe9')
   async removeProductCart(@Param('_id') _id: string) {
     const result = await this.productCartService.removeProductCart(_id);
     if (!result) throw Error('장바구니 삭제 실패');
-    return { isSucces: true, result: result };
+    return { isSucces: true, result };
   }
 }

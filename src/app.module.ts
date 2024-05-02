@@ -16,12 +16,20 @@ import { ProductQuestionModule } from './product-question/product-question.modul
 import { ProductCartService } from './product-cart/product-cart.service';
 import { ProductCartModule } from './product-cart/product-cart.module';
 import { UserSchema } from './users/schemas/user.schema';
+import { ProductCartSchema } from './products/schemas/product-cart.schema';
+import { ProductQuestionSchema } from './products/schemas/product-question.schema';
+import { ProductSchema } from './products/schemas/procuct.schema';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URL),
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: 'User', schema: UserSchema },
+      { name: 'ProductCart', schema: ProductCartSchema },
+      { name: 'Product', schema: ProductSchema },
+      { name: 'ProductQuestion', schema: ProductQuestionSchema },
+    ]),
     UsersModule,
     AuthModule,
     ProductModule,

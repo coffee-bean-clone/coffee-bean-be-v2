@@ -4,39 +4,46 @@ import {
   Post,
   Delete,
   Param,
-  Body,
   UseGuards,
+  Body,
 } from '@nestjs/common';
 import { ProductService } from './products.service';
 import { ApiTags } from '@nestjs/swagger';
-import { ProductQuestionCreateDTO } from './dto/productQuestion/ProductQuestionCreateDTO';
-import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { Public } from 'src/shared/decorators/public.decorator';
+import { ProductQuestionService } from 'src/product-question/product-question.service';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { ProductCartService } from 'src/product-cart/product-cart.service';
+import { REQ } from './dto';
+import { ApiSwaggerApiBody } from 'src/shared/decorators/swagger.decorator';
 
 @ApiTags('Product')
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly productQuestionService: ProductQuestionService,
+    private readonly productCartService: ProductCartService,
+  ) {}
   @Get('/all')
   @Public()
-  getAllProducts() {
+  async findAll() {
     return this.productService.findAll();
   }
   @Get('/new')
-  getNewProducts() {
+  async findNew() {
     return this.productService.findNew();
   }
   @Get('/sale')
-  getSaleProducts() {
+  async findSale() {
     return this.productService.findSale();
   }
   @Get('/category/:mainCategory')
-  getMainCategoryProducts(@Param('mainCategory') mainCategory: string) {
+  async findMain(@Param('mainCategory') mainCategory: string) {
     console.log(mainCategory);
     return this.productService.findMain(mainCategory);
   }
   @Get('/category/:mainCategory/:subCategory')
-  getSubCategoryProducts(
+  async findSub(
     @Param('mainCategory') mainCategory: string,
     @Param('subCategory') subCategory: string,
   ) {
@@ -44,33 +51,49 @@ export class ProductController {
     return this.productService.findSub(mainCategory, subCategory);
   }
   @Post('/add')
-  createProducts() {
+  async addProduct() {
     return this.productService.addProduct();
   }
   @Delete('/delete')
-  deleteAll() {
+  async deleteAll() {
     return this.productService.deleteAll();
   }
 
   @Post('/question/add')
   @UseGuards(JwtAuthGuard)
-  createQuestion(@Body() productCreateDTO: ProductQuestionCreateDTO) {
-    return this.productService.addProductQuestion(productCreateDTO);
+  @ApiSwaggerApiBody(REQ.ProductQuestionCreateDTO)
+  async addProductQuestion(
+    @Body() productCreateDTO: REQ.ProductQuestionCreateDTO,
+  ) {
+    return this.productQuestionService.addProductQuestion(productCreateDTO);
   }
 
   @Get('/question/:userId')
-  getUserCreatedProductQuestion(@Param('userId') userId: string) {
-    return this.productService.findUserCreatedProductQuestions(userId);
+  async findUserProductQuestions(@Param('userId') userId: string) {
+    return this.productQuestionService.findUserProductQuestions(userId);
   }
 
   @Get('/question/:productId')
-  getProductQuestions(@Param('productId') productId: string) {
-    return this.productService.findProductQuestions(productId);
+  async findProductQuestionsByProduct(@Param('productId') productId: string) {
+    return this.productQuestionService.findProductQuestionsByProduct(productId);
   }
 
   @Get('/question/:questionId')
-  getProductQuestion(@Param('questionId') questionId: string) {
+  async findProductQuestionDetail(@Param('questionId') questionId: string) {
     console.log(questionId);
-    return this.productService.findProductQuestion(questionId);
+    return this.productQuestionService.findProductQuestionDetail(questionId);
+  }
+
+  @Delete('/question/remove/:questionId')
+  async removeProductQuestion(@Param('questionId') questionId: string) {
+    return this.productQuestionService.removeProductQuestion(questionId);
+  }
+
+  @Post('/cart/add')
+  @UseGuards(JwtAuthGuard)
+  @ApiSwaggerApiBody(REQ.ProcuctCartAddDTO)
+  async addProductCart(@Body() productCartAddDTO: REQ.ProcuctCartAddDTO) {
+    await this.productCartService.addProductCart(productCartAddDTO);
+    return { isSucces: true };
   }
 }

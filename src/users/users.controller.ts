@@ -14,6 +14,7 @@ import { UsersService } from './users.service';
 import { REQ, RES } from './dto';
 import {
   ApiSwaggerApiBody,
+  ApiSwaggerApiParam,
   ApiSwaggerApiResponse,
   ApiSwaggerBearerAuth,
   ApiSwaggerOperation,
@@ -60,8 +61,11 @@ export class UsersController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/auth/login')
-  @ApiSwaggerApiResponse(HttpStatus.BAD_REQUEST, '존재하지 않는 이메일 입니다.')
-  @ApiSwaggerApiResponse(HttpStatus.NOT_FOUND, '비밀번호가 일치하지 않습니다.')
+  @ApiSwaggerApiResponse(HttpStatus.NOT_FOUND, '존재하지 않는 이메일 입니다.')
+  @ApiSwaggerApiResponse(
+    HttpStatus.BAD_REQUEST,
+    '비밀번호가 일치하지 않습니다.',
+  )
   @ApiSwaggerOperation(
     '로그인',
     '사용자를 인증 후 accessToken과 refreshToken을 반환합니다.',
@@ -83,7 +87,7 @@ export class UsersController {
     'Access Token 가져오기',
     '유저의 이메일을 통해 Access Token을 가져옵니다.',
   )
-  @ApiSwaggerApiBody(REQ.UserLoginRequestDTO)
+  @ApiSwaggerApiBody(REQ.GetAccessTokenDTO)
   @ApiSwaggerApiResponse(
     HttpStatus.OK,
     'Access Token을 성공적으로 가져왔습니다.',
@@ -103,7 +107,7 @@ export class UsersController {
     'Refresh Token 재발급',
     '유저의 이메일을 통해 Refresh Token을 재발급합니다.',
   )
-  @ApiSwaggerApiBody(REQ.UserLoginRequestDTO)
+  @ApiSwaggerApiBody(REQ.GetRefreshTokenDTO)
   @ApiSwaggerApiResponse(
     HttpStatus.OK,
     'Refresh Token을 성공적으로 재발급하였습니다.',
@@ -115,20 +119,18 @@ export class UsersController {
     @Body() userLoginRequestDTO: REQ.UserLoginRequestDTO,
   ) {
     const user = await this.usersService.findUser(userLoginRequestDTO.email);
-    console.log(user);
     return await this.authService.reissueRefreshToken(user);
   }
 
   @Get('/profile/:email')
   @UseGuards(JwtAuthGuard)
   @ApiSwaggerOperation('프로필', '인가에 성공하면 유저 정보를 반환합니다.')
-  @ApiSwaggerApiBody(REQ.UserGetProfileRequestDTO)
+  @ApiSwaggerApiParam('email', 'user1@example.com')
   @ApiSwaggerBearerAuth()
   @ApiSwaggerApiResponse(HttpStatus.OK, '성공', RES.UserGetProfileResponse)
   @ApiSwaggerApiResponse(HttpStatus.BAD_REQUEST, '없는 유저입니다.')
   @ApiSwaggerApiResponse(HttpStatus.UNAUTHORIZED, 'Unauthorized')
   async getProfile(@Param('email') email: string) {
-    console.log(email);
     const user = await this.usersService.findUser(email);
     if (!user) return '없는 유저입니다.';
     return user;

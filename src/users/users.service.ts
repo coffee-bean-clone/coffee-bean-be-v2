@@ -77,12 +77,15 @@ export class UsersService {
     return user;
   }
   async findUser(email: string) {
-    const user = await this.userModel.findOne({ email: email });
+    const user = await this.userModel
+      .findOne({ email: email })
+      .select('-password');
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    console.log(user);
     return user;
   }
   async findUserById(id: string) {
-    const existingUser = await this.userModel.findById(id);
+    const existingUser = await this.userModel.findById(id).select('-password');
     if (!existingUser) {
       throw new BadRequestException(Err.USER.NOT_FOUND);
     }

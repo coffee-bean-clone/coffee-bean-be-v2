@@ -54,3 +54,27 @@ export class ProductQuestionReadDTO {
   @ApiProperty({ example: '2024-05-14T20:57:58.000Z' })
   updatedAt: string | null;
 }
+
+class ProductCartResultDTO {
+  @ApiProperty({ example: '663365d0edb8d6de5af9f659' })
+  _id: string;
+  @ApiProperty({ example: '662744d18d85bb735ab5dc32' })
+  userId: string;
+
+  @ApiProperty({ example: '65fc29dc3f95892a6c88d371' })
+  productId: string;
+
+  @ApiProperty({ example: 2 })
+  quantity: number;
+
+  @ApiProperty({ example: '2024-05-02T10:07:12.672Z' })
+  createAt: Date;
+}
+
+export class ProductCartAddDTO {
+  @ApiProperty({ example: true })
+  isSuccess: boolean;
+
+  @ApiProperty()
+  result: ProductCartResultDTO;
+}

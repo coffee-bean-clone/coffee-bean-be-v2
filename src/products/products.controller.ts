@@ -7,6 +7,7 @@ import {
   UseGuards,
   Body,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProductService } from './products.service';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -14,13 +15,15 @@ import { Public } from 'src/shared/decorators/public.decorator';
 import { ProductQuestionService } from 'src/product-question/product-question.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { ProductCartService } from 'src/product-cart/product-cart.service';
-import { REQ } from './dto';
+import { REQ, RES } from './dto';
 import {
   ApiSwaggerApiBody,
   ApiSwaggerApiParam,
+  ApiSwaggerApiResponse,
   ApiSwaggerBearerAuth,
   ApiSwaggerOperation,
 } from 'src/shared/decorators/swagger.decorator';
+import { Err } from 'src/shared/error';
 
 @ApiTags('Product')
 @Controller('product')
@@ -149,6 +152,8 @@ export class ProductController {
   @ApiSwaggerBearerAuth()
   @ApiSwaggerOperation('장바구니 추가')
   @ApiSwaggerApiBody(REQ.ProcuctCartAddDTO)
+  @ApiSwaggerApiResponse(200, '장바구니 추가 성공', RES.ProductCartAddDTO)
+  @ApiSwaggerApiResponse(500, '장바구니 등록 실패', null)
   async addProductCart(@Body() productCartAddDTO: REQ.ProcuctCartAddDTO) {
     const result =
       await this.productCartService.addProductCart(productCartAddDTO);
@@ -187,14 +192,27 @@ export class ProductController {
     return { isSucces: true, result, length: result.length };
   }
 
-  @Delete('/cart/remove/:_id')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiSwaggerBearerAuth()
+  @Delete('/cart/remove/:userId/:productId')
+  @UseGuards(JwtAuthGuard)
+  @ApiSwaggerBearerAuth()
   @ApiSwaggerOperation('장바구니 삭제')
   @ApiSwaggerApiParam('_id', '6632d79507e2c27d8abf9fe9')
-  async removeProductCart(@Param('_id') _id: string) {
-    const result = await this.productCartService.removeProductCart(_id);
-    if (!result) throw Error('장바구니 삭제 실패');
+  @ApiSwaggerApiResponse(200, '삭제 성공', RES.ProductCartAddDTO)
+  @ApiSwaggerApiResponse(
+    400,
+    '등록되지 않은 상품입니다.',
+    Err.PRODUCT.NOT_FOUND,
+  )
+  async removeProductCart(
+    @Param('userId') userId: string,
+    @Param('productId') productId: string,
+  ) {
+    const result = await this.productCartService.removeProductCart(
+      userId,
+      productId,
+    );
+    if (!result) throw new BadRequestException(Err.PRODUCT.NOT_FOUND);
+
     return { isSucces: true, result };
   }
 }

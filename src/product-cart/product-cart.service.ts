@@ -12,27 +12,35 @@ export class ProductCartService {
   ) {}
 
   async addProductCart(productCartAddDTO: REQ.ProcuctCartAddDTO) {
-    const prevCart = await this.productCartModel.findOne({
-      userId: productCartAddDTO.userId,
-      productId: productCartAddDTO.productId,
-    });
-    if (!prevCart) {
-      const newCart = new this.productCartModel({
+    const result = await this.productCartModel.findOneAndUpdate(
+      {
         userId: productCartAddDTO.userId,
         productId: productCartAddDTO.productId,
-        createAt: new Date(),
-        quantity: 1,
-      });
-      if (!newCart) throw Error('cart 생성 실패');
-      const result = await newCart.save();
-      return result;
+      },
+      { $inc: { quantity: 1 }, $setOnInsert: { createAt: new Date() } }, // $inc 연산자로 수량을 1 증가, $setOnInsert 연산자로 createAt 필드를 설정
+      { new: true, upsert: true }, // upsert 옵션을 true로 설정하여 문서가 없는 경우 새로 생성
+    );
+    if (!result) {
+      throw new Error('cart 생성 실패');
     }
-    prevCart.quantity += 1;
-    const result = await prevCart.save();
     return result;
   }
-  async removeProductCart(_id: string) {
-    const result = await this.productCartModel.findByIdAndDelete(_id);
+
+  async removeProductCart(userId: string, productId: string) {
+    const result = await this.productCartModel.findOneAndUpdate(
+      {
+        userId: userId,
+        productId: productId,
+        quantity: { $gt: 0 }, // 수량이 0보다 큰 경우에만 수량을 1 감소시킴
+      },
+      { $inc: { quantity: -1 } }, // $inc 연산자로 수량을 1 감소
+      { new: true }, // 갱신된 문서를 반환
+    );
+
+    // if (!result) {
+    //   throw new Error('장바구니에서 해당 상품을 찾을 수 없습니다.');
+    // }
+
     return result;
   }
   async findProductCartsByUser(userId: string) {

@@ -9,6 +9,12 @@ export const Err = {
       message: '이미 존재하는 사용자입니다.',
     },
   },
+  PRODUCT: {
+    NOT_FOUND: {
+      code: 400,
+      message: '존재하지 않는 상품입니다.',
+    },
+  },
   TOKEN: {
     INVALID_TOKEN: {
       code: 401,

@@ -14,7 +14,10 @@ import { ProductQuestionService } from 'src/product-question/product-question.se
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { ProductCartService } from 'src/product-cart/product-cart.service';
 import { REQ } from './dto';
-import { ApiSwaggerApiBody } from 'src/shared/decorators/swagger.decorator';
+import {
+  ApiSwaggerApiBody,
+  ApiSwaggerApiParam,
+} from 'src/shared/decorators/swagger.decorator';
 
 @ApiTags('Product')
 @Controller('product')
@@ -56,7 +59,8 @@ export class ProductController {
   }
   @Delete('/delete')
   async deleteAll() {
-    return this.productService.deleteAll();
+    const result = await this.productService.deleteAll();
+    return result;
   }
 
   @Post('/question/add')
@@ -65,28 +69,40 @@ export class ProductController {
   async addProductQuestion(
     @Body() productCreateDTO: REQ.ProductQuestionCreateDTO,
   ) {
-    return this.productQuestionService.addProductQuestion(productCreateDTO);
+    const result =
+      await this.productQuestionService.addProductQuestion(productCreateDTO);
+    return result;
   }
 
   @Get('/question/:userId')
   async findUserProductQuestions(@Param('userId') userId: string) {
-    return this.productQuestionService.findUserProductQuestions(userId);
+    const result =
+      await this.productQuestionService.findUserProductQuestions(userId);
+    return result;
   }
 
   @Get('/question/:productId')
   async findProductQuestionsByProduct(@Param('productId') productId: string) {
-    return this.productQuestionService.findProductQuestionsByProduct(productId);
+    const result =
+      await this.productQuestionService.findProductQuestionsByProduct(
+        productId,
+      );
+    return result;
   }
 
   @Get('/question/:questionId')
   async findProductQuestionDetail(@Param('questionId') questionId: string) {
-    console.log(questionId);
-    return this.productQuestionService.findProductQuestionDetail(questionId);
+    const result =
+      await this.productQuestionService.findProductQuestionDetail(questionId);
+    return result;
   }
 
   @Delete('/question/remove/:questionId')
+  @UseGuards(JwtAuthGuard)
   async removeProductQuestion(@Param('questionId') questionId: string) {
-    return this.productQuestionService.removeProductQuestion(questionId);
+    const result =
+      await this.productQuestionService.removeProductQuestion(questionId);
+    return result;
   }
 
   @Post('/cart/add')
@@ -95,5 +111,23 @@ export class ProductController {
   async addProductCart(@Body() productCartAddDTO: REQ.ProcuctCartAddDTO) {
     await this.productCartService.addProductCart(productCartAddDTO);
     return { isSucces: true };
+  }
+
+  @Get('/cart/:userId')
+  @ApiSwaggerApiParam('userId', '660bb5864146c96c02c47978')
+  async findProductCartsByUser(@Param('userId') userId: string) {
+    await this.productCartService.findProductCartsByUser(userId);
+  }
+  @Get('/cart/:productId')
+  @ApiSwaggerApiParam('productId', '65fc29dc3f95892a6c88d369')
+  async findProductCartsByProduct(@Param('productId') productId: string) {
+    await this.productCartService.findProductCartsByProduct(productId);
+  }
+
+  @Delete('/cart/:_id')
+  @UseGuards(JwtAuthGuard)
+  @ApiSwaggerApiParam('_id', '6632d79507e2c27d8abf9fe9')
+  async removeProductCart(@Param('_id') _id: string) {
+    await this.removeProductCart(_id);
   }
 }

@@ -18,6 +18,21 @@ export class ProductCartService {
       createAt: new Date(),
     });
     if (!cart) throw Error('cart 생성 실패');
-    await cart.save();
+    const result = await cart.save();
+    return result;
+  }
+  async removeProductCart(_id: string) {
+    const result = await this.productCartModel.findByIdAndDelete(_id);
+    return result;
+  }
+  async findProductCartsByUser(userId: string) {
+    const carts = await this.productCartModel.find({ userId: userId });
+
+    return carts;
+  }
+  async findProductCartsByProduct(productId: string) {
+    const carts = await this.productCartModel.find({ productId: productId });
+
+    return carts;
   }
 }

@@ -53,3 +53,13 @@ export class EmailCheckDTO {
   @ApiProperty({ example: 'user@example.com' })
   email: string;
 }
+export class GetAccessTokenDTO {
+  @IsEmail()
+  @ApiProperty({ example: 'user@example.com' })
+  email: string;
+}
+export class GetRefreshTokenDTO {
+  @IsEmail()
+  @ApiProperty({ example: 'user@example.com' })
+  email: string;
+}
